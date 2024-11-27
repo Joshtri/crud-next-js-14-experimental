@@ -1,0 +1,51 @@
+// This is your Prisma schema file
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+}
+
+// Entitas Barang
+model Item {
+  id         String   @id @default(cuid())
+  name       String
+  quantity   Int      @default(0)
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+  supplierId String
+  supplier   Supplier @relation(fields: [supplierId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  transactions Transaction[]
+}
+
+// Entitas Kategori Barang
+model Category {
+  id    String @id @default(cuid())
+  name  String
+  items Item[]
+}
+
+// Entitas Supplier
+model Supplier {
+  id      String @id @default(cuid())
+  name    String
+  contact String
+  address String
+  items   Item[]
+}
+
+// Entitas Transaksi Barang
+model Transaction {
+  id        String   @id @default(cuid())
+  type      String   // "IN" for incoming, "OUT" for outgoing
+  quantity  Int
+  itemId    String
+  item      Item     @relation(fields: [itemId], references: [id])
+  createdAt DateTime @default(now())
+}
