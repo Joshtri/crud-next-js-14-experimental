@@ -2,61 +2,59 @@
 
 import Link from "next/link";
 import { IoAddSharp, IoPencil, IoTrashOutline } from "react-icons/io5";
-import { useFormStatus } from "react-dom";
 import clsx from "clsx";
-import { deleteContact } from "@/lib/actions";
 
-export const CreateButton = () => {
+interface ButtonProps {
+  label: string; // Label tombol
+  href?: string; // Tujuan navigasi jika menggunakan Link
+  onClick?: () => void; // Fungsi yang dijalankan ketika tombol diklik
+  icon?: JSX.Element; // Ikon tombol
+  type?: "submit" | "button"; // Tipe tombol (default: "button")
+  variant?: "primary" | "secondary" | "danger"; // Variasi tombol untuk styling
+  disabled?: boolean; // Status disabled
+  className?: string; // Kelas tambahan
+}
+
+// Button Utama
+export const Button = ({
+  label,
+  href,
+  onClick,
+  icon,
+  type = "button",
+  variant = "primary",
+  disabled = false,
+  className = "",
+}: ButtonProps) => {
+  // Styling berdasarkan variant
+  const baseClass =
+    "inline-flex items-center space-x-2 px-4 py-2 text-sm font-medium rounded focus:outline-none";
+  const variantClass = clsx({
+    "bg-blue-700 text-white hover:bg-blue-800": variant === "primary",
+    "bg-gray-200 text-gray-700 hover:bg-gray-300": variant === "secondary",
+    "bg-red-600 text-white hover:bg-red-700": variant === "danger",
+  });
+  const disabledClass = disabled ? "opacity-50 cursor-not-allowed" : "";
+  const combinedClass = clsx(baseClass, variantClass, disabledClass, className);
+
+  if (href) {
+    return (
+      <Link href={href} className={combinedClass}>
+        {icon && <span>{icon}</span>}
+        <span>{label}</span>
+      </Link>
+    );
+  }
+
   return (
-    <Link
-      href="/contacts/create"
-      className="inline-flex items-center space-x-1 text-white bg-blue-700 hover:bg-blue-800 px-5 py-[9px] rounded-sm text-sm"
+    <button
+      type={type}
+      onClick={onClick}
+      className={combinedClass}
+      disabled={disabled}
     >
-      <IoAddSharp size={20} />
-      Create
-    </Link>
-  );
-};
-
-export const EditButton = ({ id }: { id: string }) => {
-  return (
-    <Link
-      href={`/contacts/edit/${id}`}
-      className="rounded-sm border p-1 hover:bg-gray-100"
-    >
-      <IoPencil size={20} />
-    </Link>
-  );
-};
-
-export const DeleteButton = ({ id }: { id: string }) => {
-  const DeleteContactWithId = deleteContact.bind(null, id);
-  return (
-    <form action={DeleteContactWithId}>
-      <button className="rounded-sm border p-1 hover:bg-gray-100">
-        <IoTrashOutline size={20} />
-      </button>
-    </form>
-  );
-};
-
-export const SubmitButton = ({ label }: { label: string }) => {
-  const { pending } = useFormStatus();
-
-  const className = clsx(
-    "text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-sm text-sm w-full px-5 py-3 text-center",
-    {
-      "opacity-50 cursor-progress": pending,
-    }
-  );
-
-  return (
-    <button type="submit" className={className} disabled={pending}>
-      {label === "save" ? (
-        <span>{pending ? "Saving..." : "Save"}</span>
-      ) : (
-        <span>{pending ? "Updating..." : "Update"}</span>
-      )}
+      {icon && <span>{icon}</span>}
+      <span>{label}</span>
     </button>
   );
 };

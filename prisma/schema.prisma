@@ -1,37 +1,32 @@
-// This is your Prisma schema file
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
-  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
-// Entitas Barang
 model Item {
-  id         String   @id @default(cuid())
-  name       String
-  quantity   Int      @default(0)
-  categoryId String
-  category   Category @relation(fields: [categoryId], references: [id])
-  supplierId String
-  supplier   Supplier @relation(fields: [supplierId], references: [id])
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
+  id           String        @id @default(cuid())
+  name         String
+  quantity     Int           @default(0)
+  categoryId   String
+  supplierId   String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  category     Category      @relation(fields: [categoryId], references: [id])
+  supplier     Supplier      @relation(fields: [supplierId], references: [id])
   transactions Transaction[]
 }
 
-// Entitas Kategori Barang
 model Category {
   id    String @id @default(cuid())
   name  String
   items Item[]
 }
 
-// Entitas Supplier
 model Supplier {
   id      String @id @default(cuid())
   name    String
@@ -40,12 +35,26 @@ model Supplier {
   items   Item[]
 }
 
-// Entitas Transaksi Barang
 model Transaction {
   id        String   @id @default(cuid())
-  type      String   // "IN" for incoming, "OUT" for outgoing
+  type      String
   quantity  Int
   itemId    String
-  item      Item     @relation(fields: [itemId], references: [id])
   createdAt DateTime @default(now())
+  item      Item     @relation(fields: [itemId], references: [id])
+}
+
+
+// Tambahkan enum Role di bagian atas skema Prisma
+enum Role {
+  ADMIN
+  EMPLOYEE
+}
+
+// Model User dengan field role yang menggunakan enum Role
+model User {
+  id       String @id @default(uuid())
+  username String
+  password String
+  role     Role
 }
